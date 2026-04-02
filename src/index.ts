@@ -123,7 +123,7 @@ client.on('interactionCreate', async (interaction) => {
                 .setFooter({ text: `1 / ${Math.ceil(total / 7)} ページ（合計 ${total} 件）` });
 
             await interaction.editReply({
-                embeds: embed ? [embed] : [],
+                embeds: [embed],
                 components: buildComponents(keyword, 0, total, rows),
             });
 
@@ -149,9 +149,12 @@ client.on('interactionCreate', async (interaction) => {
         const newPage = action === 'next' ? currentPage + 1 : currentPage - 1;
         const { rows, total } = searchVideos(keyword, 7, newPage * 7);
 
-        const embed = interaction.message.embeds[0] ? EmbedBuilder.from(interaction.message.embeds[0]) : undefined
-            .setDescription(buildDescription(rows, newPage * 7))
-            .setFooter({ text: `${newPage + 1} / ${Math.ceil(total / 7)} ページ（合計 ${total} 件）` });
+        // ✅ メソッドチェーンを三項演算子の true 側にまとめる
+        const embed = interaction.message.embeds[0]
+            ? EmbedBuilder.from(interaction.message.embeds[0])
+                .setDescription(buildDescription(rows, newPage * 7))
+                .setFooter({ text: `${newPage + 1} / ${Math.ceil(total / 7)} ページ（合計 ${total} 件）` })
+            : undefined;
 
         await interaction.editReply({
             embeds: embed ? [embed] : [],
@@ -182,7 +185,7 @@ client.on('interactionCreate', async (interaction) => {
                 { name: '公開日',     value: video.publish_date || video.relative_date || '不明', inline: true },
             );
 
-        await interaction.followUp({ embeds: embed ? [embed] : [], ephemeral: true });
+        await interaction.followUp({ embeds: [embed], ephemeral: true });
     }
 });
 
